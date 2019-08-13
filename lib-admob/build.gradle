@@ -1,0 +1,90 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion COMPILE_SDK_VERSION as int
+
+    defaultConfig {
+        minSdkVersion MIN_SDK_VERSION as int
+        targetSdkVersion TARGET_SDK_VERSION as int
+    }
+}
+
+dependencies {
+    // 1. include the latest version of AdMob
+    api('com.google.firebase:firebase-ads:18.1.1') {
+        // 2. exclude transitive dependency which contains AdActivity
+        exclude group: 'com.google.android.gms', module: 'play-services-ads-lite'
+    }
+
+    // 2. copy needed aar from ~/.gradle/caches/modules-2/files-2.1/com.google.android.gms/play-services-ads-lite
+    api files('libs/play-services-ads-lite-18.1.1.aar')
+
+    // 3. move class AdActivity out from that .aar
+
+    // 4. include all transitive dependencies, specifying exact version from .pom file
+    api 'com.google.android.gms:play-services-ads-base:18.1.1'
+    //noinspection GradleDependency
+    api 'com.google.android.gms:play-services-basement:17.0.0'
+    //noinspection GradleDependency
+    api 'com.google.android.gms:play-services-measurement:17.0.0'
+    //noinspection GradleDependency
+    api 'com.google.android.gms:play-services-measurement-sdk:17.0.0'
+    //noinspection GradleDependency
+    api 'com.google.android.gms:play-services-measurement-sdk-api:17.0.0'
+
+    // 5. something else may be needed, but not this time
+    // api 'com.android.support:customtabs:28.0.0'
+
+    // 6. save decompiled code of AdActivity from step #3
+    // 7. add the following
+    /*
+
+    public static Reporter reporter;
+
+    public interface Reporter {
+        void report(Throwable exception, String event);
+    }
+
+    private static void report(Throwable exception, String event) {
+        Reporter r = reporter;
+        if (r != null) {
+            r.report(exception, event);
+        }
+    }
+
+    @Override
+    public void setRequestedOrientation(int requestedOrientation) {
+        try {
+            super.setRequestedOrientation(requestedOrientation);
+        } catch (RuntimeException ex) {
+            report(ex, "adactivity_set_req_ornt");
+        }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+
+        overridePendingTransition(0, 0);
+    }
+
+    protected void onCreate(Bundle var1) {
+        try {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+            getWindow().setFlags(
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN
+            );
+
+            // KEEP ORIGINAL CODE HERE
+        } catch (RuntimeException ex) {
+            report(ex, "adactivity_on_create");
+
+            finish();
+        }
+    }
+     */
+
+    // 8. init public field AdActivity.reporter from inside your Application.onCreate()
+}
